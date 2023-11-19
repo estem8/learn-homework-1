@@ -11,10 +11,9 @@
 
 
 def hello_user():
-    """
-    Замените pass на ваш код
-    """
-    pass
+    while True:
+      if input(f'Как дела?\n').capitalize() == 'Хорошо':
+        break
 
     
 if __name__ == "__main__":
