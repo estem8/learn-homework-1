@@ -13,45 +13,39 @@
 
 """
 import logging
+import ephem
+from telegram import Update
+from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
+from settings import *
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-
-logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO,
-                    filename='bot.log')
-
-
-PROXY = {
-    'proxy_url': 'socks5://t1.learn.python.ru:1080',
-    'urllib3_proxy_kwargs': {
-        'username': 'learn',
-        'password': 'python'
-    }
-}
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
 
-def greet_user(update, context):
-    text = 'Вызван /start'
-    print(text)
-    update.message.reply_text(text)
+
+async def planet(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  try:
+    planet_name = update.message.text.split()[1].capitalize()
+    planet_obj = getattr(ephem, planet_name)()
+    planet_obj.compute()
+    constellation = ephem.constellation(planet_obj)[1]
+    text_result = f'{planet_name} сейчас находится в созвездии {constellation}.'
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'{text_result}')
+  except IndexError:
+    error_text = 'Планета не найдена. Введите корректное название планеты.'
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'{error_text}')
+        
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text='Привет введи комманду /planet Mars или любое название на английском')
 
 
-def talk_to_me(update, context):
-    user_text = update.message.text
-    print(user_text)
-    update.message.reply_text(text)
-
-
-def main():
-    mybot = Updater("КЛЮЧ, КОТОРЫЙ НАМ ВЫДАЛ BotFather", request_kwargs=PROXY, use_context=True)
-
-    dp = mybot.dispatcher
-    dp.add_handler(CommandHandler("start", greet_user))
-    dp.add_handler(MessageHandler(Filters.text, talk_to_me))
-
-    mybot.start_polling()
-    mybot.idle()
-
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    application = ApplicationBuilder().token(BOT_TOKEN).build()
+    start_handler = CommandHandler('start', start)
+    planet_handler = CommandHandler('planet', planet)
+    application.add_handler(start_handler)
+    application.add_handler(planet_handler)
+    application.run_polling()
