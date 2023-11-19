@@ -13,11 +13,13 @@
     
 """
 
-def discounted(price, discount, max_discount=20)
-    """
-    Замените pass на ваш код
-    """
-    pass
+def discounted(price, discount, max_discount=20):
+  try:
+    price = abs(float(price))
+    discount = abs(float(discount))
+    max_discount = abs(int(max_discount))
+  except (ValueError, TypeError) as ErCod:
+    return f'Incorrect input data {ErCod}'
     
 if __name__ == "__main__":
     print(discounted(100, 2))
