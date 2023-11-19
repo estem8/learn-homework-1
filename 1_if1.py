@@ -13,13 +13,24 @@
 * Вывести содержимое переменной на экран
 
 """
+kindergarten = range(3,8)
+school = range(8,19)
+university = range(19,26)
+working = range(26,66)
+
 
 def main():
-    """
-    Эта функция вызывается автоматически при запуске скрипта в консоли
-    В ней надо заменить pass на ваш код
-    """
-    pass
+  age = int(input('Введите возраст:\n'))
+  if age in kindergarten:
+    print('Детский сад')
+  elif age in school:
+    print('Школа')
+  elif age in university:
+    print(f'Университет')
+  elif age in working:
+    print(f'Работа')
+  else:
+    print('Возраст задан не верно')
 
 if __name__ == "__main__":
     main()
