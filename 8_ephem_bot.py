@@ -17,6 +17,7 @@ import ephem
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
 from settings import *
+from datetime import date
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -26,13 +27,19 @@ logging.basicConfig(
 
 
 async def planet(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  input_message = update.message.text
+  
   try:
-    planet_name = update.message.text.split()[1].capitalize()
-    planet_obj = getattr(ephem, planet_name)()
-    planet_obj.compute()
-    constellation = ephem.constellation(planet_obj)[1]
-    text_result = f'{planet_name} сейчас находится в созвездии {constellation}.'
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'{text_result}')
+     planet_from_text = input_message.split()[1].capitalize()
+     planet_obj = getattr(ephem, planet_from_text)(date.today())
+     answer_cons = ephem.constellation(planet_obj)[1]
+     text_result = f'{planet_from_text} сейчас находится в созвездии {answer_cons}.'
+     await context.bot.send_message(chat_id=update.effective_chat.id, text=f'{text_result}')
+  # try:
+  #   planet_name = update.message.text.split()[1].capitalize()
+  #   planet_obj = getattr(ephem, planet_name)()
+  #   planet_obj.compute()
+  #   constellation = ephem.constellation(planet_obj)[1]
   except IndexError:
     error_text = 'Планета не найдена. Введите корректное название планеты.'
     await context.bot.send_message(chat_id=update.effective_chat.id, text=f'{error_text}')
