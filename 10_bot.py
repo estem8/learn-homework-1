@@ -15,6 +15,8 @@ def checker(incoming_message: str) -> str:
         if hasattr(ephem, item):
             logging.info(f'Попался {item}')
             cont_result = ephem.constellation(getattr(ephem,item)(date.today()))[1]
+        else:
+            return f'Введены ошибочные данные'
     return cont_result
 
 async def echo(update: Update, context):
